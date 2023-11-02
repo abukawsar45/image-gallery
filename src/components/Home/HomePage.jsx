@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react';
 import LargeImage from '../LargeImage/LargeImage';
 import OtherImage from '../OtherImage/OtherImage';
 
-
-const Home = () => {
-  const[allData, setAllData] = useState([]);
+const Homee = () => {
+  const [allData, setAllData] = useState([]);
 
   useEffect(() => {
-    fetch("./allImage.json")
+    fetch('./allImage.json')
       .then((res) => res.json())
       .then((data) => {
         // console.log(data);
@@ -28,4 +27,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Homee;
