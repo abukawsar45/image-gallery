@@ -32,7 +32,7 @@ const HomePage2 = () => {
   };
 
   return (
-    <div className='mx-2 md:mx-4 lg:mx-8 my-2 md:my-4 lg:my-8 grid grid-cols-5 grid-rows-2 gap-4'>
+    <div className='mx-2 md:mx-4 lg:mx-8 my-2 md:my-4 lg:my-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 grid-rows-2 gap-4'>
       <div className='col-span-2 row-span-2'>
         {allData.slice(0, 1).map((item, index) => (
           <div
