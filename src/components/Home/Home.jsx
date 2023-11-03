@@ -3,6 +3,7 @@ import { BsCardImage } from 'react-icons/bs';
 
 const Home = () => {
   const [allData, setAllData] = useState([]);
+  console.log(allData);
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [checkedItems, setCheckedItems] = useState(
@@ -77,23 +78,18 @@ const Home = () => {
   };
 
   // Add file
-  const [selectedFile, setSelectedFile] = useState(null);
-  console.log(selectedFile);
 
+  const handleAddImage = (e) => {
+    if (e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const myData = {
+        id: allData.length + 1,
+        image: URL.createObjectURL(file),
+      };
 
-
-const handleAddImage = (e) => {
-  if (e.target.files.length > 0) {
-    const file = e.target.files[0];
-    const myData = {
-      id: allData.length + 1,
-      image: URL.createObjectURL(file),
-    };
-
-    setAllData([...allData, myData]); 
-  }
-};
-
+      setAllData([...allData, myData]);
+    }
+  };
 
   return (
     <div className='my-2 md:my-4 lg:my-8'>
@@ -167,7 +163,7 @@ const handleAddImage = (e) => {
             <img
               src={item.image}
               alt=''
-              className={`w-full rounded-md group-hover:opacity-40 duration-200 ${
+              className={`w-full object-contain rounded-md group-hover:opacity-40 duration-200 ${
                 isBeingDragged(index + 1) ? 'dragging-image' : ''
               } ${checkedItems[index + 1] ? 'opacity-40' : ''}`}
             />
@@ -181,7 +177,7 @@ const handleAddImage = (e) => {
         ))}
         {/* Add file input */}
         {
-          <div className='py-20 border md:border-2 row-span-1 border-slate-400 rounded-lg border-dotted flex items-center justify-center'>
+          <div className='border md:border-2 row-span-1 border-slate-400 rounded-lg border-dotted flex items-center justify-center'>
             <input
               type='file'
               id='file-input'
@@ -193,11 +189,11 @@ const handleAddImage = (e) => {
             />
             <label
               htmlFor='file-input'
-              className='file-label flex flex-col justify-center items-center cursor-pointer gap-2 md:gap-4'
-            ><BsCardImage className='text-xl md:text-2xl'/>
+              className='file-label sm:my-12 my-14 md:my-16 lg:max-h-full flex flex-col justify-center items-center cursor-pointer gap-2 md:gap-4'
+            >
+              <BsCardImage className='text-xl md:text-2xl' />
               <span className='font-semibold'>Add Images</span>
             </label>
-           
           </div>
         }
       </div>
