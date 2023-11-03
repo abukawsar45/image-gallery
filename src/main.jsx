@@ -8,6 +8,6 @@ import Home from './components/Home/Home';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Home />
+    <Home2 />
   </React.StrictMode>
 );
