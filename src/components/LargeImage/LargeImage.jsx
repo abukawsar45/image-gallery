@@ -22,14 +22,16 @@ const LargeImage = ({
       onDrop={(e) => handleDrop(e, 0)}
       className={`relative group col-span-2 row-span-2 group checked:opacity-50 cursor-pointer border md:border-2 border-slate-400 duration-700 rounded-lg bg-opacity-0 hover:bg-opacity-80 bg-zinc-600 ${
         isBeingDragged(0)
-          ? ' transform scale-125 transition-transform'
+          ? ' transform scale-105 md:scale-110 transition-transform'
           : ''
       }`}
     >
       <img
         src={image || 'https://i.ibb.co/zHcQDGn/headphone.webp'}
         alt={image}
-        className={`w-full object-contain rounded-md group-hover:opacity-40 ${checkedItems[0] ? 'opacity-40' : ''}`}
+        className={`w-full object-contain rounded-md group-hover:opacity-40 ${
+          checkedItems[0] ? 'opacity-40' : ''
+        }`}
         onError={(e) => {
           e.target.src = 'https://i.ibb.co/zHcQDGn/headphone.webp';
         }}
