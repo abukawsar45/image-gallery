@@ -80,19 +80,38 @@ const Home = () => {
     setCheckedItems(Array(allData.length).fill(false)); 
   };
 
-  // Add file
+  // Add file with generate a uniqe id
+const isIdUnique = (id, data) => data.some((item) => item.id === id);
 
-  const handleAddImage = (e) => {
-    if (e.target.files.length > 0) {
-      const file = e.target.files[0];
+const generateUniqueId = (data, maxNum = 10) => {
+  for (let i = 0; i < maxNum; i++) {
+    const potentialId = `${Math.random()
+      .toString(2)
+      .substr(2, 3)}_${Date.now()}`;
+    if (!isIdUnique(potentialId, data)) {
+      console.log(potentialId);
+      return potentialId;
+    }
+  }
+  // console.log('not generate a unique ID.');
+  return null;
+};
+
+const handleAddImage = (e) => {
+  if (e.target.files.length > 0) {
+    const file = e.target.files[0];
+
+    const uniqueId = generateUniqueId(allData);
+
+    if (uniqueId) {
       const myData = {
-        id: allData.length + 1,
+        id: uniqueId,
         image: URL.createObjectURL(file),
       };
-
       setAllData([...allData, myData]);
     }
-  };
+  }
+};
 
   return (
     <div className='my-2 md:my-4 lg:my-8'>
