@@ -1,16 +1,19 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BsCardImage } from 'react-icons/bs';
-import './Home.css'
-
+import './Home.css';
 
 const Home = () => {
   const [allData, setAllData] = useState([]);
   console.log(allData);
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
   const [checkedItems, setCheckedItems] = useState(
     Array(allData.length).fill(false)
   );
+
+  // --------console part---------
+    console.log({isDragging});
 
   useEffect(() => {
     fetch('./allImage.json')
@@ -24,11 +27,14 @@ const Home = () => {
   const handleDragStart = (e, index) => {
     e.dataTransfer.setData('index', index);
     setDraggedIndex(index);
+    setIsDragging(true);
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+    //  setDraggedIndex(null);
+    setIsDragging(false);
   };
 
   const handleDragEnter = (e, toIndex) => {
@@ -39,6 +45,7 @@ const Home = () => {
       newData.splice(toIndex, 0, draggedItem);
       setAllData(newData);
       setDraggedIndex(toIndex);
+      setIsDragging(true);
     }
   };
 
@@ -49,12 +56,12 @@ const Home = () => {
       const [draggedItem] = newData.splice(draggedIndex, 1);
       newData.splice(toIndex, 0, draggedItem);
       setAllData(newData);
-       setDraggedIndex(null);
-       
+      // setDraggedIndex(null);
+      setIsDragging(false);
     }
   };
 
-  const isBeingDragged = (index) => draggedIndex === index;
+  const isBeingDragged = (index) => isDragging && draggedIndex === index;
 
   const toggleChecked = (fileId) => {
     setCheckedItems((prevState) => {
@@ -77,41 +84,47 @@ const Home = () => {
       prevData.filter((item) => !selectedFiles.includes(item.id))
     );
     setSelectedFiles([]);
-    setCheckedItems(Array(allData.length).fill(false)); 
+    setCheckedItems(Array(allData.length).fill(false));
+  };
+  const handleDragEnd = () => {
+    setIsDragging(false);
   };
 
-  // Add file with generate a uniqe id
-const isIdUnique = (id, data) => data.some((item) => item.id === id);
+  // -----------------Add file----------------------------------
 
-const generateUniqueId = (data, maxNum = 10) => {
-  for (let i = 0; i < maxNum; i++) {
-    const potentialId = `${Math.random()
-      .toString(2)
-      .substr(2, 3)}_${Date.now()}`;
-    if (!isIdUnique(potentialId, data)) {
-      console.log(potentialId);
-      return potentialId;
+  // ---------check id---------------
+  const isIdUnique = (id, data) => data.some((item) => item.id === id);
+
+  // -------generate uniqe id-------
+  const generateUniqueId = (data, maxNum = 10) => {
+    for (let i = 0; i < maxNum; i++) {
+      const potentialId = `${Math.random()
+        .toString(2)
+        .substr(2, 3)}_${Date.now()}`;
+      if (!isIdUnique(potentialId, data)) {
+        console.log(potentialId);
+        return potentialId;
+      }
     }
-  }
-  // console.log('not generate a unique ID.');
-  return null;
-};
+    // console.log('not generate a unique ID.');
+    return null;
+  };
 
-const handleAddImage = (e) => {
-  if (e.target.files.length > 0) {
-    const file = e.target.files[0];
+  const handleAddImage = (e) => {
+    if (e.target.files.length > 0) {
+      const file = e.target.files[0];
 
-    const uniqueId = generateUniqueId(allData);
+      const uniqueId = generateUniqueId(allData);
 
-    if (uniqueId) {
-      const myData = {
-        id: uniqueId,
-        image: URL.createObjectURL(file),
-      };
-      setAllData([...allData, myData]);
+      if (uniqueId) {
+        const myData = {
+          id: uniqueId,
+          image: URL.createObjectURL(file),
+        };
+        setAllData([...allData, myData]);
+      }
     }
-  }
-};
+  };
 
   return (
     <div className='my-2 md:my-4 lg:my-8'>
@@ -150,19 +163,22 @@ const handleAddImage = (e) => {
               onDragOver={(e) => handleDragOver(e, 0)}
               onDragEnter={(e) => handleDragEnter(e, 0)}
               onDrop={(e) => handleDrop(e, 0)}
-              className={`relative group checked:opacity-50 cursor border md:border-2 border-slate-400 rounded-lg bg-opacity-0 hover:bg-opacity-80 bg-zinc-600 ${
-                isBeingDragged(0) ? 'dragging' : ''
+              onDragEnd={handleDragEnd}
+              className={`relative group checked:opacity-50 cursor-pointer border md:border-2 border-slate-400 duration-700 rounded-lg bg-opacity-0 hover:bg-opacity-80 bg-zinc-600 ${
+                isBeingDragged(0)
+                  ? 'dragging transform scale-125 transition-transform'
+                  : ''
               }`}
             >
               <img
                 src={item.image}
                 alt=''
-                className={`w-full rounded-md group-hover:opacity-40 duration-200 ${
+                className={`w-full item-container rounded-md group-hover:opacity-40  ${
                   isBeingDragged(0) ? 'dragging-image' : ''
                 } ${checkedItems[0] ? 'opacity-40' : ''}`}
               />
               <input
-                className='absolute top-2 left-2 lg:top-4 lg:left-4 w-5 h-5 lg:w-6 lg:h-6 rounded-lg opacity-0 group-hover:opacity-100 checked:opacity-100'
+                className='absolute top-2 left-2 lg:top-4 lg:left-4 w-5 h-5 lg:w-6 lg:h-6 cursor-pointer rounded-lg opacity-0 group-hover:opacity-100 checked:opacity-100'
                 type='checkbox'
                 checked={checkedItems[0]}
                 onChange={() => toggleChecked(item.id)}
@@ -178,19 +194,23 @@ const handleAddImage = (e) => {
             onDragOver={(e) => handleDragOver(e, index + 1)}
             onDragEnter={(e) => handleDragEnter(e, index + 1)}
             onDrop={(e) => handleDrop(e, index + 1)}
-            className={`relative w-full group row-span-1 checked:opacity-50 cursor border md:border-2 border-slate-400 rounded-lg bg-opacity-0 hover:bg-opacity-80 bg-zinc-600 ${
-              isBeingDragged(index + 1) ? 'dragging' : ''
+            onDragEnd={handleDragEnd}
+            className={`relative w-full group row-span-1 checked:opacity-50 cursor-pointer border md:border-2 border-slate-400 duration-700 rounded-lg bg-opacity-0 hover:bg-opacity-80 bg-zinc-600 ${
+              isBeingDragged(index + 1)
+                ? 'dragging transform scale-125 transition-transform'
+                : ''
             }`}
           >
             <img
               src={item.image}
               alt=''
-              className={`w-full object-contain rounded-md group-hover:opacity-40 duration-200 ${
+              className={`w-full object-contain item-container rounded-md group-hover:opacity-40  ${
                 isBeingDragged(index + 1) ? 'dragging-image' : ''
               } ${checkedItems[index + 1] ? 'opacity-40' : ''}`}
             />
+
             <input
-              className='absolute top-2 left-2 lg:top-4 lg:left-4 w-5 h-5 lg:w-6 lg:h-6 rounded-lg opacity-0 group-hover:opacity-100 checked:opacity-100'
+              className='absolute top-2 left-2 lg:top-4 lg:left-4 w-5 h-5 lg:w-6 lg:h-6 cursor-pointer rounded-lg opacity-0 group-hover:opacity-100 checked:opacity-100'
               type='checkbox'
               checked={checkedItems[index + 1]}
               onChange={() => toggleChecked(item.id)}
