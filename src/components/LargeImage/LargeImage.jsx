@@ -22,7 +22,7 @@ const LargeImage = ({
       onDrop={(e) => handleDrop(e, 0)}
       className={`relative group col-span-2 row-span-2 group checked:opacity-50 cursor-pointer border md:border-2 border-slate-400 duration-700 rounded-lg bg-opacity-0 hover:bg-opacity-80 bg-zinc-600 ${
         isBeingDragged(0)
-          ? ' transform scale-105 md:scale-110 transition-transform'
+          ? ' transform scale-105 md:scale-110 lg:scale-125 transition-transform'
           : ''
       }`}
     >
