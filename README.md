@@ -42,3 +42,22 @@ To get the project up and running on your local machine, follow these steps:
 
    ```bash
    git clone https://github.com/abukawsar45/image-gallery.git
+
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd image-gallery
+   
+3. Install the required npm packages:
+
+   ```bash
+   npm install
+
+4. Start the project on your local development server:
+
+   ```bash
+   npm run dev
+   
+   
+   
