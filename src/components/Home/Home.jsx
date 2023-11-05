@@ -141,7 +141,12 @@ const Home = () => {
               {selectedFiles.length === 0 ? 'Gallery' : ''}
             </p>
             {selectedFiles.length > 0 && (
-              <p className='text-2xl font-semibold'>
+              <p className='text-2xl font-semibold flex items-center'>
+                <input
+                  className=' w-5 h-5 lg:w-6 lg:h-6 mr-2 cursor-pointer rounded-lg'
+                  type='checkbox'
+                  checked
+                />
                 {selectedFiles.length > 1
                   ? `${selectedFiles.length} Files Selected`
                   : `${selectedFiles.length} File Selected`}
