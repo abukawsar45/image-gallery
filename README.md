@@ -4,16 +4,6 @@
 
 This project offers a user-friendly and interactive experience that enhances user engagement.
 
-## Table of Contents
-
-- [Demo](#demo)
-- [Features](#features)
-- [Technologies](#technologies)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-
 
 ## Features
 
