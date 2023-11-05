@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { BsCardImage } from 'react-icons/bs';
+import { useEffect, useState } from 'react';
+import LargeImage from '../LargeImage/LargeImage';
+import OtherImage from '../OtherImage/OtherImage';
+import AddImage from '../AddImage/AddImage';
 
 const Home = () => {
   const [allData, setAllData] = useState([]);
-  console.log(allData);
+  // console.log(allData);
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
   const [checkedItems, setCheckedItems] = useState(
     Array(allData.length).fill(false)
   );
+
+  // --------console part---------
+  // console.log(isDragging);
 
   useEffect(() => {
     fetch('./allImage.json')
@@ -19,16 +25,23 @@ const Home = () => {
       });
   }, []);
 
+  // -----------------drag method start------------
+  // drag start
   const handleDragStart = (e, index) => {
     e.dataTransfer.setData('index', index);
     setDraggedIndex(index);
+    // setIsDragging(true);
   };
 
-  const handleDragOver = (e, index) => {
+  // drag over or end
+  const handleDragOver = (e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+    //  setDraggedIndex(null);
+    setIsDragging(false);
   };
 
+  // drag running
   const handleDragEnter = (e, toIndex) => {
     e.preventDefault();
     if (draggedIndex !== null && draggedIndex !== toIndex) {
@@ -37,9 +50,11 @@ const Home = () => {
       newData.splice(toIndex, 0, draggedItem);
       setAllData(newData);
       setDraggedIndex(toIndex);
+      setIsDragging(true);
     }
   };
 
+  // drop capture
   const handleDrop = (e, toIndex) => {
     e.preventDefault();
     if (draggedIndex !== null && draggedIndex !== toIndex) {
@@ -47,12 +62,15 @@ const Home = () => {
       const [draggedItem] = newData.splice(draggedIndex, 1);
       newData.splice(toIndex, 0, draggedItem);
       setAllData(newData);
-      setDraggedIndex(toIndex);
+      // setDraggedIndex(null);
+      setIsDragging(false);
     }
   };
+  // -----------------drag method end----------------------------------
 
-  const isBeingDragged = (index) => draggedIndex === index;
+  const isBeingDragged = (index) => isDragging && draggedIndex === index;
 
+  // check button toggle
   const toggleChecked = (fileId) => {
     setCheckedItems((prevState) => {
       const newState = [...prevState];
@@ -69,31 +87,54 @@ const Home = () => {
     });
   };
 
+  // handle delete button
   const deleteSelectedFiles = () => {
     setAllData((prevData) =>
       prevData.filter((item) => !selectedFiles.includes(item.id))
     );
     setSelectedFiles([]);
-    setCheckedItems(Array(allData.length).fill(false)); // Reset checked items
+    setCheckedItems(Array(allData.length).fill(false));
   };
 
-  // Add file
+  // -----------------Add file---------------
 
+  // ---------check id---------------
+  const isIdUnique = (id, data) => data.some((item) => item.id === id);
+
+  // -------generate uniqe id-------
+  const generateUniqueId = (data, maxNum = 10) => {
+    for (let i = 0; i < maxNum; i++) {
+      const potentialId = `${Math.random()
+        .toString(2)
+        .substr(2, 3)}_${Date.now()}`;
+      if (!isIdUnique(potentialId, data)) {
+        // console.log(potentialId);
+        return potentialId;
+      }
+    }
+    // console.log('not generate a unique ID.');
+    return null;
+  };
+
+  // handle add with onchange
   const handleAddImage = (e) => {
     if (e.target.files.length > 0) {
       const file = e.target.files[0];
-      const myData = {
-        id: allData.length + 1,
-        image: URL.createObjectURL(file),
-      };
-
-      setAllData([...allData, myData]);
+      const uniqueId = generateUniqueId(allData);
+      if (uniqueId) {
+        const myData = {
+          id: uniqueId,
+          image: URL.createObjectURL(file),
+        };
+        setAllData([...allData, myData]);
+      }
     }
   };
 
   return (
-    <div className='my-2 md:my-4 lg:my-8'>
+    <div className='my-2 md:my-4 lg:my-8 mx-auto max-w-[1920px]'>
       <div>
+        {/* headter text and selected file and delete button */}
         <div className='flex justify-between items-center mx-2 md:mx-4 lg:mx-8'>
           <div>
             <p className='text-2xl font-semibold'>
@@ -118,84 +159,42 @@ const Home = () => {
         </div>
         <div className='mt-1 md:mt-2 lg:mt-5 mb-4 md:mb-7 lg:mb-10 border-b border-slate-200'></div>
       </div>
-      <div className='mx-2 md:mx-4 lg:mx-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 grid-rows-2 gap-4'>
-        <div className='group border col-span-2 row-span-2'>
-          {allData.slice(0, 1).map((item, index) => (
-            <div
-              key={item.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDragOver={(e) => handleDragOver(e, 0)}
-              onDragEnter={(e) => handleDragEnter(e, 0)}
-              onDrop={(e) => handleDrop(e, 0)}
-              className={`relative group checked:opacity-50 cursor border md:border-2 border-slate-400 rounded-lg bg-opacity-0 hover:bg-opacity-80 bg-zinc-600 ${
-                isBeingDragged(0) ? 'dragging' : ''
-              }`}
-            >
-              <img
-                src={item.image}
-                alt=''
-                className={`w-full rounded-md group-hover:opacity-40 duration-200 ${
-                  isBeingDragged(0) ? 'dragging-image' : ''
-                } ${checkedItems[0] ? 'opacity-40' : ''}`}
-              />
-              <input
-                className='absolute top-2 left-2 lg:top-4 lg:left-4 w-5 h-5 lg:w-6 lg:h-6 rounded-lg opacity-0 group-hover:opacity-100 checked:opacity-100'
-                type='checkbox'
-                checked={checkedItems[0]}
-                onChange={() => toggleChecked(item.id)}
-              />
-            </div>
-          ))}
-        </div>
-        {allData.slice(1, allData?.length).map((item, index) => (
-          <div
+      <div className='mx-2 md:mx-4 lg:mx-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 grid-rows-2 gap-4 md:gap-7 lg:gap-9'>
+        {/* large image */}
+        {allData.slice(0, 1).map((item, index) => (
+          <LargeImage
             key={item.id}
+            item={item}
+            index={index}
             draggable
-            onDragStart={(e) => handleDragStart(e, index + 1)}
-            onDragOver={(e) => handleDragOver(e, index + 1)}
-            onDragEnter={(e) => handleDragEnter(e, index + 1)}
-            onDrop={(e) => handleDrop(e, index + 1)}
-            className={`relative w-full group row-span-1 checked:opacity-50 cursor border md:border-2 border-slate-400 rounded-lg bg-opacity-0 hover:bg-opacity-80 bg-zinc-600 ${
-              isBeingDragged(index + 1) ? 'dragging' : ''
-            }`}
-          >
-            <img
-              src={item.image}
-              alt=''
-              className={`w-full object-contain rounded-md group-hover:opacity-40 duration-200 ${
-                isBeingDragged(index + 1) ? 'dragging-image' : ''
-              } ${checkedItems[index + 1] ? 'opacity-40' : ''}`}
-            />
-            <input
-              className='absolute top-2 left-2 lg:top-4 lg:left-4 w-5 h-5 lg:w-6 lg:h-6 rounded-lg opacity-0 group-hover:opacity-100 checked:opacity-100'
-              type='checkbox'
-              checked={checkedItems[index + 1]}
-              onChange={() => toggleChecked(item.id)}
-            />
-          </div>
+            handleDragStart={handleDragStart}
+            handleDragOver={handleDragOver}
+            handleDragEnter={handleDragEnter}
+            handleDrop={handleDrop}
+            isBeingDragged={isBeingDragged}
+            checkedItems={checkedItems}
+            toggleChecked={toggleChecked}
+          />
+        ))}
+
+        {/* other image */}
+        {allData.slice(1, allData?.length).map((item, index) => (
+          <OtherImage
+            key={item.id}
+            item={item}
+            index={index}
+            draggable
+            handleDragStart={handleDragStart}
+            handleDragOver={handleDragOver}
+            handleDragEnter={handleDragEnter}
+            handleDrop={handleDrop}
+            isBeingDragged={isBeingDragged}
+            checkedItems={checkedItems}
+            toggleChecked={toggleChecked}
+          />
         ))}
         {/* Add file input */}
-        {
-          <div className='border md:border-2 row-span-1 border-slate-400 rounded-lg border-dotted flex items-center justify-center'>
-            <input
-              type='file'
-              id='file-input'
-              name='file'
-              accept='.jpg, .jpeg, .png, .pdf, .doc, .docx'
-              className='file-input'
-              style={{ display: 'none' }}
-              onChange={(e) => handleAddImage(e)}
-            />
-            <label
-              htmlFor='file-input'
-              className='file-label sm:my-12 my-14 md:my-16 lg:max-h-full flex flex-col justify-center items-center cursor-pointer gap-2 md:gap-4'
-            >
-              <BsCardImage className='text-xl md:text-2xl' />
-              <span className='font-semibold'>Add Images</span>
-            </label>
-          </div>
-        }
+        {<AddImage handleAddImage={handleAddImage} />}
       </div>
     </div>
   );

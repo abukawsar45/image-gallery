@@ -1,1 +1,1 @@
-# [Live site](https://image-gallery-three-eta.vercel.app/)
+[Live site](https://image-gallery-three-eta.vercel.app/)
