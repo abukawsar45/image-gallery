@@ -143,7 +143,7 @@ const Home = () => {
             {selectedFiles.length > 0 && (
               <p className='text-2xl font-semibold flex items-center'>
                 <input
-                  className=' w-5 h-5 lg:w-6 lg:h-6 mr-2 cursor-pointer rounded-lg'
+                  className=' w-5 h-5 lg:w-6 lg:h-6 mr-2 md:mr-3 rounded-lg'
                   type='checkbox'
                   checked
                 />
@@ -155,7 +155,7 @@ const Home = () => {
           </div>
           {selectedFiles.length > 0 && (
             <button
-              className='text-xl font-semibold text-red-400 hover:text-red-600 hover:underline rounded-lg px-3 py-1'
+              className='text-xl font-semibold text-red-400 hover:text-red-600 hover:underline rounded-lg px-3 '
               onClick={deleteSelectedFiles}
             >
               {selectedFiles.length > 1 ? 'Delete files' : 'Delete file'}
